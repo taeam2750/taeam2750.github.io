@@ -2,8 +2,8 @@ name: 네이버 블로그 동기화
 
 on:
   schedule:
-    # 한국시간 오전 8시. 예약은 UTC이고, 깃허브가 몇 분에서 한 시간까지 늦출 수 있다.
-    - cron: '0 23 * * *'
+    # 한국시간 오전 9시. 예약은 UTC 0시이고, 깃허브가 몇 분에서 한 시간까지 늦출 수 있다.
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 permissions:
