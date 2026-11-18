@@ -20,8 +20,15 @@ const decode = (s) => {
 };
 
 const posts = JSON.parse(await fs.readFile(POSTS, 'utf8'));
-const todo = posts.filter((p) => !p.tags?.length);
-console.log(`전체 ${posts.length}건 / 태그 비어 있는 글 ${todo.length}건`);
+// LOGNOS 가 있으면 그 글만 본다. 매일 동기화할 때 태그 없는 예전 글을 다시 묻지 않기 위함이다.
+const only = new Set(
+  (process.env.LOGNOS ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+);
+const todo = posts.filter((p) => !p.tags?.length && (!only.size || only.has(String(p.logNo))));
+console.log(`전체 ${posts.length}건 / 태그 조회 대상 ${todo.length}건`);
 
 const byLog = new Map(posts.map((p) => [String(p.logNo), p]));
 let filled = 0;

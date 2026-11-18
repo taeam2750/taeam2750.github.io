@@ -125,14 +125,20 @@ async function fetchPost(meta) {
     $('#categoryTitle strong').text().trim() ||
     '미분류';
 
+  // 최근 글은 화면에 "13시간 전"처럼만 보인다. 절대 시각은 하단 스크립트 인자에 있다.
+  const stamp = html.match(/postViewBottomTitleListController\.start\([\s\S]{0,500}?'(\d{13})'/)?.[1];
   const published = $('.se_publishDate, .blog2_series .date, .date').first().text().trim();
   const plain = body.filter((b) => b.type === 'p').map((b) => b.text).join(' ');
+  const pubDate =
+    stamp && Number.isFinite(Number(stamp))
+      ? new Date(Number(stamp)).toISOString()
+      : parseDate(published || meta.addDate, new Date().toISOString());
 
   return {
     logNo: meta.logNo,
     title: meta.title,
     category,
-    pubDate: parseDate(published || meta.addDate, new Date().toISOString()),
+    pubDate,
     tags: [], // scripts/tags.mjs 가 배치 API로 채운다
     sourceUrl: meta.sourceUrl,
     body,

@@ -24,7 +24,13 @@ posts.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 const esc = (s) =>
   String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const iso = (d) => new Date(d).toISOString();
-const ymd = (d) => new Date(d).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+const ymd = (d) =>
+  new Date(d).toLocaleDateString('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 const postUrl = (p) => `${SITE.baseUrl}/posts/${p.logNo}.html`;
 
 // 카테고리: 이름은 보여주고, URL은 안전한 번호를 쓴다.
