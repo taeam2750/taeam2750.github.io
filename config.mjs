@@ -1,7 +1,7 @@
 export const SITE = {
   blogId: 'stentiar',
   rss: 'https://rss.blog.naver.com/stentiar.xml',
-  baseUrl: 'https://taeam2750.github.io/barunsaju',
+  baseUrl: 'https://taeam2750.github.io',
   title: '바른사주진로연구소 — 사주·명리 공부 아카이브',
   description:
     '20년 경력 태암 선생이 풀어내는 사주·명리 해설 아카이브. 한 번 보고 끝내는 운세가 아니라, 스스로 자기 사주를 읽고 이해하도록 돕는 깊이 있는 명리 자료를 모았습니다. 상담 문의 전화번호는 010-4705-2750 입니다.',
