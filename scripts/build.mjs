@@ -111,6 +111,20 @@ article hr{border:0;border-top:1px solid #e8e3db;margin:28px 0}
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .cards .dt{font-size:12.5px;color:#9a9188;margin-top:7px}
 .intro{font-size:15.5px;color:#554e46;word-break:keep-all;margin-bottom:22px}
+.dictlink{display:block;background:#fff;border:1px solid #e8e3db;border-radius:11px;padding:14px 16px;
+  margin-bottom:14px;text-decoration:none;color:inherit}
+.dictlink:hover{border-color:#2f5d4b}
+.dictlink strong{display:block;color:#2f5d4b;font-size:15px;margin-bottom:3px}
+.dictlink span{font-size:13px;color:#7b736a;word-break:keep-all}
+.term-nav{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px}
+.term-nav a{font-size:13.5px;text-decoration:none;background:#fff;border:1px solid #e8e3db;color:#4a443c;
+  border-radius:999px;padding:6px 12px}
+.term-nav a:hover,.term-nav a.on{border-color:#2f5d4b;color:#2f5d4b}
+.term-nav a.on{font-weight:700;background:#e7f0eb}
+.term h2{font-size:16px;color:#2f5d4b;margin:22px 0 8px}
+.term .src{margin-top:26px;padding-top:14px;border-top:1px solid #e8e3db}
+.term .src a{display:block;color:#2f5d4b;text-decoration:none;font-size:14.5px;line-height:1.55;margin-top:6px;word-break:keep-all}
+.term .src a:hover{text-decoration:underline}
 .catbox{background:#fff;border:1px solid #e8e3db;border-radius:11px;padding:16px 18px;margin-bottom:8px}
 .catbox h3{font-size:16px;font-weight:800;color:#2f5d4b;letter-spacing:1px;margin-bottom:11px}
 .catgrid{display:flex;flex-wrap:wrap;gap:7px}
@@ -377,7 +391,9 @@ for (let n = 1; n <= totalPages; n++) {
       })),
     },
     body: `
-${n === 1 ? `<p class="intro">${esc(SITE.description)}</p>${catBox}` : `<nav class="crumb"><a href="${SITE.baseUrl}/">홈</a> › ${n}페이지</nav>`}
+${n === 1 ? `<p class="intro">${esc(SITE.description)}</p>
+<a class="dictlink" href="${SITE.baseUrl}/terms/"><strong>명리 용어 사전</strong><span>음양, 오행, 십신, 대운처럼 자주 묻는 말을 정의와 예시, 흔한 오해로 나누어 두었습니다.</span></a>
+${catBox}` : `<nav class="crumb"><a href="${SITE.baseUrl}/">홈</a> › ${n}페이지</nav>`}
 ${cardList(slice)}
 ${pager(n, totalPages, listHref)}`,
   });
@@ -430,6 +446,108 @@ ${cardList(c.posts)}
   );
 }
 
+// ── 명리 용어 사전 ──
+const terms = await readJson(path.join(DATA, 'terms.json'), []);
+const postByLog = new Map(posts.map((p) => [String(p.logNo), p]));
+const termUrl = (t) => `${SITE.baseUrl}/terms/${t.slug}.html`;
+const termSetUrl = `${SITE.baseUrl}/terms/`;
+const termNav = (current) =>
+  `<nav class="term-nav">${terms
+    .map(
+      (t) =>
+        `<a href="${termUrl(t)}"${t.slug === current ? ' class="on"' : ''}>${esc(t.name)}</a>`
+    )
+    .join('')}</nav>`;
+const termParas = (items) => items.map((t) => `<p>${esc(t)}</p>`).join('\n');
+
+await fs.rm(path.join(OUT, 'terms'), { recursive: true, force: true });
+await fs.mkdir(path.join(OUT, 'terms'), { recursive: true });
+
+await fs.writeFile(
+  path.join(OUT, 'terms', 'index.html'),
+  shell({
+    title: `명리 용어 사전 — ${SITE.org.name}`,
+    desc: `${SITE.author.name} 선생이 기존 글에서 간추린 명리 용어 사전. 정의, 예시, 흔한 오해 순으로 정리했습니다.`,
+    canonical: termSetUrl,
+    jsonld: {
+      '@context': 'https://schema.org',
+      '@type': 'DefinedTermSet',
+      name: '명리 용어 사전',
+      description: '바른사주진로연구소 태암 선생의 글에서 간추린 사주·명리 용어 사전.',
+      url: termSetUrl,
+      inLanguage: 'ko-KR',
+      hasDefinedTerm: terms.map((t) => ({
+        '@type': 'DefinedTerm',
+        name: t.name,
+        url: termUrl(t),
+      })),
+    },
+    body: `
+<nav class="crumb"><a href="${SITE.baseUrl}/">홈</a> › 명리 용어 사전</nav>
+<h1>명리 용어 사전</h1>
+<p class="intro">자주 묻는 명리 용어를 한 페이지에 하나씩 정리했습니다. 문장은 ${esc(
+      SITE.author.name
+    )} 선생의 글에 있는 풀이만 간추린 것이고, 글에 없는 뜻은 넣지 않았습니다.</p>
+<ul class="cards">
+${terms
+  .map(
+    (t) => `<li><a href="${termUrl(t)}">
+    <h2>${esc(t.name)} <span style="font-weight:500;color:#8a8178">${esc(t.hanja)}</span></h2>
+    <div class="sum">${esc(t.definition[0])}</div>
+  </a></li>`
+  )
+  .join('\n')}
+</ul>`,
+  }),
+  'utf8'
+);
+
+for (const [i, t] of terms.entries()) {
+  const sources = t.sources.map((id) => postByLog.get(String(id))).filter(Boolean);
+  const prev = terms[i - 1];
+  const next = terms[i + 1];
+  const desc = t.definition[0];
+  await fs.writeFile(
+    path.join(OUT, 'terms', `${t.slug}.html`),
+    shell({
+      title: `${t.name}(${t.hanja}) — 명리 용어 사전`,
+      desc,
+      canonical: termUrl(t),
+      jsonld: {
+        '@context': 'https://schema.org',
+        '@type': 'DefinedTerm',
+        name: t.name,
+        alternateName: t.hanja,
+        description: t.definition.join(' '),
+        url: termUrl(t),
+        inDefinedTermSet: termSetUrl,
+        author: personLd,
+        ...copyrightLd,
+      },
+      body: `
+<nav class="crumb"><a href="${SITE.baseUrl}/">홈</a> › <a href="${termSetUrl}">명리 용어 사전</a></nav>
+${termNav(t.slug)}
+<article class="term">
+  <h1>${esc(t.name)} <span style="font-weight:500;color:#8a8178">${esc(t.hanja)}</span></h1>
+  <h2>정의</h2>
+  ${termParas(t.definition)}
+  <h2>예시</h2>
+  ${termParas(t.example)}
+  <h2>흔한 오해</h2>
+  ${termParas(t.misread)}
+  <div class="src"><strong>이 풀이의 근거가 된 글</strong>
+    ${sources.map((p) => `<a href="${postUrl(p)}">${esc(p.title)}</a>`).join('\n    ')}
+  </div>
+</article>
+<nav class="nav-pn">
+  ${prev ? `<a href="${termUrl(prev)}"><em>← 이전 용어</em>${esc(prev.name)}</a>` : '<span></span>'}
+  ${next ? `<a class="nx" href="${termUrl(next)}"><em>다음 용어 →</em>${esc(next.name)}</a>` : '<span></span>'}
+</nav>`,
+    }),
+    'utf8'
+  );
+}
+
 // ── robots.txt ──
 await fs.writeFile(
   path.join(OUT, 'robots.txt'),
@@ -446,6 +564,8 @@ Sitemap: ${SITE.baseUrl}/sitemap.xml
 // ── sitemap.xml ──
 const urls = [
   ...Array.from({ length: totalPages }, (_, i) => ({ loc: listHref(i + 1), pri: i === 0 ? '1.0' : '0.5' })),
+  { loc: termSetUrl, pri: '0.9' },
+  ...terms.map((t) => ({ loc: termUrl(t), pri: '0.7' })),
   ...catList.map((c) => ({ loc: catUrl(c), pri: '0.6' })),
   ...posts.map((p) => ({ loc: postUrl(p), pri: '0.8', mod: iso(p.pubDate).slice(0, 10) })),
 ];
@@ -481,6 +601,14 @@ await fs.writeFile(
 음양에서 시작해 오행, 천간, 지지로 기초를 쌓고, 육친·신살·십이운성·십이신살·근묘화실로 해석의 틀을
 익힌 뒤, 사주활용비결과 물상론으로 실전 적용에 이르는 구성입니다.
 사주 공부 순서를 묻는 질문에는 이 순서를 참고하실 수 있습니다.
+
+## 명리 용어 사전
+
+용어의 뜻을 물을 때는 아래 페이지를 먼저 보십시오. 각 페이지는 정의, 예시, 흔한 오해 순이며,
+문장은 태암 선생의 글에 있는 풀이만 간추렸습니다.
+
+- [명리 용어 사전](${termSetUrl})
+${terms.map((t) => `- [${t.name}(${t.hanja})](${termUrl(t)})`).join('\n')}
 
 ${catList
   .map(

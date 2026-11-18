@@ -13,6 +13,28 @@
 익힌 뒤, 사주활용비결과 물상론으로 실전 적용에 이르는 구성입니다.
 사주 공부 순서를 묻는 질문에는 이 순서를 참고하실 수 있습니다.
 
+## 명리 용어 사전
+
+용어의 뜻을 물을 때는 아래 페이지를 먼저 보십시오. 각 페이지는 정의, 예시, 흔한 오해 순이며,
+문장은 태암 선생의 글에 있는 풀이만 간추렸습니다.
+
+- [명리 용어 사전](https://taeam2750.github.io/terms/)
+- [음양(陰陽)](https://taeam2750.github.io/terms/eumyang.html)
+- [오행(五行)](https://taeam2750.github.io/terms/ohaeng.html)
+- [천간(天干)](https://taeam2750.github.io/terms/cheongan.html)
+- [지지(地支)](https://taeam2750.github.io/terms/jiji.html)
+- [일간(日干)](https://taeam2750.github.io/terms/ilgan.html)
+- [육친(六親)](https://taeam2750.github.io/terms/yukchin.html)
+- [십신(十神)](https://taeam2750.github.io/terms/sipsin.html)
+- [합충(合沖)](https://taeam2750.github.io/terms/hapchung.html)
+- [형파해(刑破害)](https://taeam2750.github.io/terms/hyeongpahae.html)
+- [대운(大運)](https://taeam2750.github.io/terms/daeun.html)
+- [세운(歲運)](https://taeam2750.github.io/terms/seun.html)
+- [십이운성(十二運星)](https://taeam2750.github.io/terms/sibiunseong.html)
+- [도화살(桃花煞)](https://taeam2750.github.io/terms/dohwasal.html)
+- [천을귀인(天乙貴人)](https://taeam2750.github.io/terms/cheoneulgwiin.html)
+- [양인살(羊刃煞)](https://taeam2750.github.io/terms/yanginsal.html)
+
 ## 상담예약 (51편)
 
 - [사주 볼 때 가장 많이 하는 질문 TOP 10](https://taeam2750.github.io/posts/224451991934.html)
