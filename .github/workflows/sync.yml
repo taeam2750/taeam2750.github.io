@@ -1,0 +1,33 @@
+name: 네이버 블로그 동기화
+
+on:
+  schedule:
+    # 한국시간 오전 8시. 예약은 UTC이고, 깃허브가 몇 분에서 한 시간까지 늦출 수 있다.
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/sync.mjs
+      - name: 새 글이 있으면 배포
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data docs
+          if git diff --cached --quiet; then
+            echo "새 글 없음"
+            exit 0
+          fi
+          git commit -m "네이버 블로그 새 글 동기화"
+          git push
